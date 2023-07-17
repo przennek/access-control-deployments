@@ -1,0 +1,4 @@
+- name: Run the streaming server
+  become: true
+  become_user: pc
+  ansible.builtin.command: /home/pc/src/run_camera.sh

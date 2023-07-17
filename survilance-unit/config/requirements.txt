@@ -1,0 +1,2 @@
+picamera
+ws4py

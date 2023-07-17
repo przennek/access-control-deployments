@@ -1,0 +1,13 @@
+- name: Copy requirements.txt
+  ansible.builtin.copy:
+    src: ../../config/requirements.txt
+    dest: /home/pc/requirements.txt
+    owner: pc
+    group: pc
+    mode: '0744'
+
+- name: Install requirements.txt into venv
+  pip:
+    requirements: /home/pc/requirements.txt
+    virtualenv: /home/pc/venv/ipfon
+    virtualenv_command: /usr/bin/virtualenv
