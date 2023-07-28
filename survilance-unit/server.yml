@@ -1,9 +1,0 @@
----
-- hosts: servers
-  become: true
-  become_user: root
-  roles:
-    - {role: 'common', tags: 'common'}
-    - {role: 'deploy', tags: 'deploy'}
-    - {role: 'install', tags: 'install'}
-    - {role: 'run', tags: 'run'}

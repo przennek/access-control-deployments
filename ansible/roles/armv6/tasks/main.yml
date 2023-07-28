@@ -1,0 +1,10 @@
+- name: Install docker-compose
+  get_url:
+    url : https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-linux-armv6
+    dest: /usr/local/bin/docker-compose
+    mode: 'u+x,g+x'
+
+- name: Chown the docker-compose because you can't be paranoid enough with this stuff
+  become: true
+  ansible.builtin.command:
+    cmd: sudo chmod +x /usr/local/bin/docker-compose

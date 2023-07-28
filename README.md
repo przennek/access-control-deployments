@@ -1,10 +1,12 @@
-# How to run this
+# How to run this [MAC]
+
+# Deployment
 
 ## 1. Create ./config directory and insert the following files:
 - raspios.img - download newest version from https://www.raspberrypi.com/software/
 - authorized_keys - generate ssh keys and paste public key into this file
 - userconf.txt - https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/configuration/headless.adoc
-- wpa_supplicant.conf
+- wpa_supplicant.conf:
     ```
     ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
     update_config=1
@@ -20,15 +22,17 @@
 - run ./burn-image.sh (on mac), supply the name of the disk. See ``diskutil list`` to determine the 
   name of the disk for the SD card. Example: ``./burn-image.sh disk5``.
 - make sure that your ssh keys are loaded via ``ssh-add``
+- make sure rootfs ext4 partition is mounted, I use ```extFS for mac```.
 
-## 3. Manual steps
-### SSH into the machine using the login and password from userconf and:
-- create ``~/.ssh/authorized_keys``
-- run ``raspi-config`` and enable legacy camera support 
+## 3. Run the ansible to finish the setup
+- ``./enable_ssh_keys.sh user@ip_address``
+- ``./deploy.sh <arch>``
 
-## 4. Setup the streaming server
-- ``cd survilance-unit``
-- ``ansible-playbook -i production server.yml``
+You will be asked for the user password **once**. After the user and group is set by```hch.sh``` 
+the ssh key will be used. After this single execution of ```hch.sh```, it won't have to be executed anymore.
 
-## 5. Just run the server (after install and restart)
-``ansible-playbook -i production server.yml --tags run``
+## 4. Manual steps
+### SSH into the machine:
+- run ``raspi-config`` and enable legacy camera support
+- run ```systemctl --user enable pulseaudio```
+- run ```systemctl --user start pulseaudio```

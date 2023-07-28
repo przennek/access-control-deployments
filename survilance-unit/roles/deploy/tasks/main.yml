@@ -1,7 +1,0 @@
-- name: Copy streaming server source files
-  ansible.builtin.copy:
-    src: ../../src
-    dest: /home/pc
-    owner: pc
-    group: pc
-    mode: '0744'

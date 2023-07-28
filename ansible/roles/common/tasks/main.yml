@@ -1,0 +1,140 @@
+---
+- name: Update apt-get repo and cache
+  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+- name: Upgrade all apt packages
+  apt: upgrade=dist force_apt_get=yes
+
+- name: Install pulseaudio
+  ansible.builtin.apt:
+    name: pulseaudio
+    state: present
+
+- name: Install docker packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+  tags:
+    - docker
+
+- name: Add Docker official GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  tags:
+    - docker
+
+- name: Verify that we have the key with the fingerprint
+  apt_key:
+    id: 0EBFCD88
+    state: present
+  tags:
+    - docker
+
+- name: Set up the stable repository
+  apt_repository:
+    repo: deb [arch=armhf] https://download.docker.com/linux/raspbian buster stable
+    state: present
+  tags:
+    - docker
+
+- name: Update apt packages
+  apt:
+    update_cache: yes
+  tags:
+    - docker
+
+- name: Install docker
+  apt:
+    name: docker-ce
+    state: present
+    update_cache: yes
+  tags:
+    - docker
+
+- name: Add remote "pc" user to "docker" group
+  user:
+    name: "pc"
+    groups: "docker"
+    append: yes
+  tags:
+    - docker
+
+
+
+# UV4L UNCOMMENT FOR WEB-RTC
+#- name: Deploy the uv4l install script
+#  ansible.builtin.copy:
+#    src: ../../res/bin/install_uv4l.sh
+#    dest: /home/pc/bin/install_uv4l.sh
+#    owner: pc
+#    group: pc
+#    mode: '0744'
+#
+#- name: Run the uv4l install script
+#  become: true
+#  ansible.builtin.command:
+#    cmd: /home/pc/bin/install_uv4l.sh
+
+
+# LEGACY C++ streamer, works fine but missing options webRTC might have
+#- name: Install libjpeg9-dev [streaming]
+#  ansible.builtin.apt:
+#    name: libjpeg9-dev
+#    state: present
+#
+#- name: Install cmake [streaming]
+#  ansible.builtin.apt:
+#    name: libjpeg9-dev
+#    state: present
+#
+#- name: Deploy the mjpg-streamer
+#  ansible.builtin.copy:
+#    src: ../../res/mjpg-streamer.tar.gz
+#    dest: /home/pc
+#    owner: pc
+#    group: pc
+#    mode: '0744'
+#
+#- name: Deploy the mjpg-streamer build script
+#  ansible.builtin.copy:
+#    src: ../../res/build-streamer.sh
+#    dest: /home/pc
+#    owner: pc
+#    group: pc
+#    mode: '0744'
+#
+#- name: Extract the mjpg-streamer
+#  unarchive:
+#    src: /home/pc/mjpg-streamer.tar.gz
+#    dest: /home/pc
+#    remote_src: yes
+#    extra_opts: "--strip-components=1"
+#    creates: /home/pc/mjpg-streamer
+#
+#- name: Deploy the stream html page
+#  ansible.builtin.copy:
+#    src: ../../res/stream.html
+#    dest: /home/pc/mjpg-streamer-experimental/www/stream.html
+#    owner: pc
+#    group: pc
+#    mode: '0744'
+#
+#- name: Compile the mjpg-streamer
+#  become: true
+#  become_user: pc
+#  ansible.builtin.command: /home/pc/build-streamer.sh
+#
+#- name: Deploy the systemd config file for streaming
+#  ansible.builtin.copy:
+#    src: ../../res/streamd.service
+#    dest: /etc/systemd/system/streamd.service
+#    owner: pc
+#    group: pc
+#    mode: '0744'
