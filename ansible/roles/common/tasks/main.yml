@@ -10,6 +10,26 @@
     name: pulseaudio
     state: present
 
+- name: Install pulseaudio bluetooth
+  ansible.builtin.apt:
+    name: pulseaudio-module-bluetooth
+    state: present
+
+- name: Install vim
+  ansible.builtin.apt:
+    name: vim
+    state: present
+
+- name: Install expect
+  ansible.builtin.apt:
+    name: expect
+    state: present
+
+- name: Install ffmpeg
+  ansible.builtin.apt:
+    name: ffmpeg
+    state: present
+
 - name: Install docker packages
   apt:
     name: "{{ item }}"
@@ -66,75 +86,31 @@
   tags:
     - docker
 
-
+- name: Reset every night at 03:30 AM 
+  lineinfile:
+    path: /var/spool/cron/crontabs/root
+    line: "30 3 * * * /sbin/shutdown -r now"
+    create: yes
 
 # UV4L UNCOMMENT FOR WEB-RTC
-#- name: Deploy the uv4l install script
-#  ansible.builtin.copy:
-#    src: ../../res/bin/install_uv4l.sh
-#    dest: /home/pc/bin/install_uv4l.sh
-#    owner: pc
-#    group: pc
-#    mode: '0744'
-#
-#- name: Run the uv4l install script
-#  become: true
-#  ansible.builtin.command:
-#    cmd: /home/pc/bin/install_uv4l.sh
+- name: Create bin dir
+  file:
+    path: /home/pc/bin
+    state: directory
+    mode: "0755"
 
+- name: Deploy the uv4l install script
+  ansible.builtin.copy:
+    src: ../../res/bin/install_uv4l.sh
+    dest: /home/pc/bin/install_uv4l.sh
+    owner: pc
+    group: pc
+    mode: '0744'
 
-# LEGACY C++ streamer, works fine but missing options webRTC might have
-#- name: Install libjpeg9-dev [streaming]
-#  ansible.builtin.apt:
-#    name: libjpeg9-dev
-#    state: present
-#
-#- name: Install cmake [streaming]
-#  ansible.builtin.apt:
-#    name: libjpeg9-dev
-#    state: present
-#
-#- name: Deploy the mjpg-streamer
-#  ansible.builtin.copy:
-#    src: ../../res/mjpg-streamer.tar.gz
-#    dest: /home/pc
-#    owner: pc
-#    group: pc
-#    mode: '0744'
-#
-#- name: Deploy the mjpg-streamer build script
-#  ansible.builtin.copy:
-#    src: ../../res/build-streamer.sh
-#    dest: /home/pc
-#    owner: pc
-#    group: pc
-#    mode: '0744'
-#
-#- name: Extract the mjpg-streamer
-#  unarchive:
-#    src: /home/pc/mjpg-streamer.tar.gz
-#    dest: /home/pc
-#    remote_src: yes
-#    extra_opts: "--strip-components=1"
-#    creates: /home/pc/mjpg-streamer
-#
-#- name: Deploy the stream html page
-#  ansible.builtin.copy:
-#    src: ../../res/stream.html
-#    dest: /home/pc/mjpg-streamer-experimental/www/stream.html
-#    owner: pc
-#    group: pc
-#    mode: '0744'
-#
-#- name: Compile the mjpg-streamer
-#  become: true
-#  become_user: pc
-#  ansible.builtin.command: /home/pc/build-streamer.sh
-#
-#- name: Deploy the systemd config file for streaming
-#  ansible.builtin.copy:
-#    src: ../../res/streamd.service
-#    dest: /etc/systemd/system/streamd.service
-#    owner: pc
-#    group: pc
-#    mode: '0744'
+- name: Deploy the connect_bluetooth script
+  ansible.builtin.copy:
+    src: ../../res/bin/connect_bluetooth.sh
+    dest:  /home/pc/bin/connect_bluetooth.sh
+    owner: pc
+    group: pc
+    mode: '0744'

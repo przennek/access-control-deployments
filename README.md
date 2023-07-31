@@ -36,3 +36,17 @@ the ssh key will be used. After this single execution of ```hch.sh```, it won't 
 - run ``raspi-config`` and enable legacy camera support
 - run ```systemctl --user enable pulseaudio```
 - run ```systemctl --user start pulseaudio```
+- run ./bin/install_uv4l.sh
+
+#TODO Automate
+1.
+sudo vim /etc/bluetooth/main.conf
+ControllerMode = le
+
+2.
+vim "/etc/uv4l/uv4l-raspicam.conf"
+
+server-option = --port=8001
+server-option = --use-ssl=yes
+server-option = --ssl-private-key-file=/home/pc/app/ssl_certificates/server.key
+server-option = --ssl-certificate-file=/home/pc/app/ssl_certificates/server.crt
