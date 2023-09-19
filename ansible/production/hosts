@@ -1,2 +1,2 @@
 [servers]
-surv ansible_host=192.168.1.156
+surv ansible_host=bramka

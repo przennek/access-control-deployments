@@ -5,6 +5,10 @@
 - name: Upgrade all apt packages
   apt: upgrade=dist force_apt_get=yes
 
+- name: Run rpi-update
+  become: yes
+  command: rpi-update
+
 - name: Install pulseaudio
   ansible.builtin.apt:
     name: pulseaudio
@@ -92,20 +96,11 @@
     line: "30 3 * * * /sbin/shutdown -r now"
     create: yes
 
-# UV4L UNCOMMENT FOR WEB-RTC
-- name: Create bin dir
-  file:
+- name: Create bin
+  ansible.builtin.file:
     path: /home/pc/bin
     state: directory
-    mode: "0755"
-
-- name: Deploy the uv4l install script
-  ansible.builtin.copy:
-    src: ../../res/bin/install_uv4l.sh
-    dest: /home/pc/bin/install_uv4l.sh
-    owner: pc
-    group: pc
-    mode: '0744'
+    recurse: yes
 
 - name: Deploy the connect_bluetooth script
   ansible.builtin.copy:
