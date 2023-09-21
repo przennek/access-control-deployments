@@ -5,10 +5,6 @@
 - name: Upgrade all apt packages
   apt: upgrade=dist force_apt_get=yes
 
-- name: Run rpi-update
-  become: yes
-  command: rpi-update
-
 - name: Install pulseaudio
   ansible.builtin.apt:
     name: pulseaudio
@@ -27,11 +23,6 @@
 - name: Install expect
   ansible.builtin.apt:
     name: expect
-    state: present
-
-- name: Install ffmpeg
-  ansible.builtin.apt:
-    name: ffmpeg
     state: present
 
 - name: Install docker packages
