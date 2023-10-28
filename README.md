@@ -17,7 +17,15 @@
         psk="PASSWORD"
     }
     ```            
-
+- .asound
+  ```
+  pcm.!default {
+    type asym
+    playback.pcm "hw:1,0"
+    capture.pcm "hw:1,0"
+  }
+ ```
+- check examples directory for the rest of the files
 ## 2. Burn the image on the SD card
 - run ``./burn-image.sh`` (mac only), supply the name of the disk. See ``diskutil list`` to determine the 
   name of the disk for the SD card. Example: ``./burn-image.sh disk5``.
