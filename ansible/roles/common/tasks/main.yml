@@ -20,6 +20,11 @@
     name: vim
     state: present
 
+- name: Install pip
+  ansible.builtin.apt:
+    name: python3-pip
+    state: present
+
 - name: Install expect
   ansible.builtin.apt:
     name: expect
@@ -93,10 +98,88 @@
     state: directory
     recurse: yes
 
-- name: Deploy the connect_bluetooth script
-  ansible.builtin.copy:
-    src: ../../res/bin/connect_bluetooth.sh
-    dest:  /home/pc/bin/connect_bluetooth.sh
-    owner: pc
-    group: pc
-    mode: '0744'
+- name: Install uWSGI with SSL support
+  environment:
+    CFLAGS: "-I/usr/local/opt/openssl/include"
+    LDFLAGS: "-L/usr/local/opt/openssl/lib"
+    UWSGI_PROFILE_OVERRIDE: "ssl=true"
+  command: "pip install uwsgi -Iv"
+
+- name: Install portaudio19-dev
+  ansible.builtin.apt:
+    name: portaudio19-dev
+    state: present
+
+- name: Install UV4L and UV4L-raspicam
+  become: yes
+  become_user: root
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - uv4l
+    - uv4l-raspicam
+
+- name: Install UV4L-raspicam-extras
+  become: yes
+  become_user: root
+  apt:
+    name: uv4l-raspicam-extras
+    state: present
+
+- name: Install UV4L packages
+  become: yes
+  become_user: root
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - uv4l-server
+    - uv4l-uvc
+    - uv4l-xscreen
+    - uv4l-mjpegstream
+    - uv4l-dummy
+    - uv4l-raspidisp
+
+- name: Install UV4L-webrtc
+  become: yes
+  become_user: root
+  apt:
+    name: uv4l-webrtc
+    state: present
+
+- name: Install UV4L-demos
+  become: yes
+  become_user: root
+  apt:
+    name: uv4l-demos
+    state: present
+
+- name: Install UV4L-xmpp-bridge
+  become: yes
+  become_user: root
+  apt:
+    name: uv4l-xmpp-bridge
+    state: present
+
+- name: Deploy asound.conf
+  become: yes
+  become_user: root
+  copy:
+    src: ../../../config/.asound
+    dest: "/etc/asound.conf"
+
+- name: Deploy .asound file
+  copy:
+    src: ../../../config/.asound
+    dest: "/home/pc/.asound"
+
+- name: Deploy alsa.conf file
+  copy:
+    src: ../../../config/alsa.conf
+    dest: "/usr/share/alsa/alsa.conf"
+
+- name: Deploy uv4l config file
+  copy:
+    src: ../../../config/uv4l-raspicam.conf
+    dest: "/etc/uv4l/uv4l-raspicam.conf"

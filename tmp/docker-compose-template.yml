@@ -1,0 +1,66 @@
+# this is a prod docker-compose
+
+version: '3.8'
+
+services:
+  app:
+    image: przennek/access-control-api-armv7:$VERSION_TAG
+    restart: always
+    expose:
+      - 5000
+    ports:
+      - "12101:12101"
+      - "12183:12183"
+    environment:
+      - FLASK_APP=/src/aca/api/access_control_api.py
+      - FLASK_ENV=production
+      - PULSE_SERVER=unix:/run/user/1000/pulse/native
+      - XDG_RUNTIME_DIR=/run/user/1000
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+    volumes:
+      - "/var/lib/dbus:/var/lib/dbus"
+      - "/home/pc/.config/pulse/cookie:/root/.config/pulse/cookie"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/run/user/1000/pulse:/run/user/1000/pulse"
+      - "/etc/machine-id:/etc/machine-id"
+    devices:
+      - "/dev/gpiomem:/dev/gpiomem"
+      - "/dev/snd:/dev/snd"
+      - "/dev/shm:/dev/shm"
+    group_add:
+      - audio
+
+  nginx:
+    image: nginx:1.25.1
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl_certificates:/etc/nginx/ssl  # Mount SSL certificate files
+    depends_on:
+      - app
+
+  redis:
+    image: przennek/aca-redis:0.0.1
+    volumes:
+      - /home/pc/storage:/data # Mount /home/pc/storage as the data directory
+    ports:
+      - "6379:6379"
+    restart: always
+
+  swagger_ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./swagger.yml:/swagger.yaml
+      - ./schemas:/schemas
+    environment:
+      - SWAGGER_JSON=/swagger.yaml
+    depends_on:
+      - app
